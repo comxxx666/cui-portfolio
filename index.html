@@ -319,7 +319,9 @@
         <div class="project-cover detail-cover" id="detailCover"><div class="cover-symbol" id="detailSymbol">DZ</div></div>
         <div class="detail-columns">
           <div><h3>项目介绍</h3><p class="muted" id="detailDescription"></p><h3 style="margin-top:26px">技术栈与方向</h3><div class="tag-row" id="detailTech"></div><p class="muted" style="font-size:12px;margin-top:18px">项目图片使用本页原创 CSS 图形占位；后续可替换为自己制作或拥有使用权的截图。</p></div>
-          <div><h3>作品评论</h3><p class="muted" style="font-size:13px">无需注册即可发表。评论仅保存在当前浏览器中。</p>
+          <div><h3>作品评论</h3><p class="muted" style="font-size:13px">
+评论和留言会保存在云端，所有访客都可以查看。请勿填写个人隐私信息。
+。</p>
             <form class="form-grid" id="projectCommentForm"><input class="field" id="commentName" maxlength="30" placeholder="昵称（选填，默认访客）"><textarea class="field" id="commentText" maxlength="500" placeholder="写下你的想法…" required></textarea><button class="btn btn-primary" type="submit">提交评论</button></form>
             <div class="comment-list" id="projectCommentList"></div>
           </div>
@@ -366,7 +368,36 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const projects = {
+   
+const SUPABASE_URL = "https://ckpbotfdllcfeciyzzum.supabase.co";
+
+// 使用 Supabase 页面中 sb_publishable_ 开头的公钥
+const SUPABASE_KEY = "sb_publishable_ua7-YnVZY1_7sb0oyFsBIg_TiVMY9Jz";
+
+async function supabaseRequest(table, options = {}) {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/${table}`,
+    {
+      ...options,
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+        ...options.headers
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Supabase 请求失败 (${response.status}): ${detail}`);
+  }
+
+  if (response.status === 204) return [];
+  return response.json();
+}
+ const projects = {
       "dengzan": {
         title: "DengZan_Game", category: "游戏开发 · 进行中", symbol: "DZ", cover: "blue",
         description: "邓赞的高中日常与故事。使用 Ren'Py 引擎制作的原创文字剧情小游戏，通过人物对话、剧情选择和分支探索校园日常。当前页面展示的是项目介绍与原创占位图形，实际开发进度可在后续更新。",
@@ -421,14 +452,37 @@
     }));
 
     let currentProject = "dengzan";
-    function renderProjectComments() {
-      const comments = safeGet("cuiPortfolio:comments:" + currentProject, []);
-      const list = $("#projectCommentList");
-      if (!comments.length) { list.innerHTML = '<div class="empty-state">还没有评论，欢迎分享你的看法。</div>'; return; }
-      list.innerHTML = comments.slice().reverse().map(item => `
-        <div class="comment-item"><div class="comment-meta"><strong>${escapeHTML(item.name)}</strong><span>${escapeHTML(item.date)}</span></div><p>${escapeHTML(item.text)}</p></div>
-      `).join("");
+   async 
+async function renderProjectComments() {
+  const list = document.getElementById("projectCommentList");
+  list.innerHTML = '<div class="empty-state">正在加载评论...</div>';
+
+  try {
+    const comments = await supabaseRequest(
+      `project_comments?select=id,project_id,name,body,created_at&project_id=eq.${encodeURIComponent(currentProject)}&order=created_at.asc`
+    );
+
+    if (!comments.length) {
+      list.innerHTML = '<div class="empty-state">还没有评论，欢迎分享你的看法。</div>';
+      return;
     }
+
+    list.innerHTML = comments.map(item => `
+      <div class="comment-item">
+        <div class="comment-meta">
+          <strong>${escapeHTML(item.name)}</strong>
+          <span>${new Date(item.created_at).toLocaleString("zh-CN")}</span>
+        </div>
+        <p>${escapeHTML(item.body)}</p>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    console.error("加载项目评论失败：", error);
+    list.innerHTML = '<div class="empty-state">评论加载失败，请稍后刷新。</div>';
+  }
+}
+
     function openProject(id) {
       const project = projects[id]; if (!project) return;
       currentProject = id;
@@ -445,38 +499,120 @@
     $$("[data-open-project]").forEach(button => button.addEventListener("click", () => openProject(button.dataset.openProject)));
     $("#closeDetail").addEventListener("click", () => $("#projectDetail").classList.remove("open"));
 
-    $("#projectCommentForm").addEventListener("submit", event => {
-      event.preventDefault();
-      const text = $("#commentText").value.trim(); if (!text) return;
-      const name = $("#commentName").value.trim() || "访客";
-      const comments = safeGet("cuiPortfolio:comments:" + currentProject, []);
-      comments.push({ name, text, date: new Date().toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" }) });
-      if (safeSet("cuiPortfolio:comments:" + currentProject, comments)) {
-        $("#commentText").value = ""; renderProjectComments(); showToast("评论已保存在当前浏览器。");
-      }
+    
+$("#projectCommentForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const text = $("#commentText").value.trim();
+  if (!text) {
+    showToast("请先输入评论内容。");
+    return;
+  }
+
+  const name = $("#commentName").value.trim() || "访客";
+
+  if (name.length > 30 || text.length > 500) {
+    showToast("昵称最多30个字符，评论最多500个字符。");
+    return;
+  }
+
+  try {
+    await supabaseRequest("project_comments", {
+      method: "POST",
+      body: JSON.stringify([{
+        project_id: currentProject,
+        name: name,
+        body: text
+      }])
     });
 
-    function renderGuestbook() {
-      const entries = safeGet("cuiPortfolio:guestbook", []);
-      $("#guestCount").textContent = entries.length + " 条";
-      const list = $("#guestList");
-      if (!entries.length) { list.innerHTML = '<div class="empty-state">还没有留言，欢迎成为第一位访客。</div>'; return; }
-      list.innerHTML = entries.slice().reverse().map(item => `
-        <div class="comment-item"><div class="comment-meta"><strong>${escapeHTML(item.name)}</strong><span>${escapeHTML(item.date)}</span></div>
-          ${item.topic ? `<div style="font-weight:650;font-size:13px;margin-bottom:5px">${escapeHTML(item.topic)}</div>` : ""}
-          <p>${escapeHTML(item.text)}</p></div>
-      `).join("");
+    $("#commentText").value = "";
+    await renderProjectComments();
+    showToast("评论已发布，所有访客都可以看到。");
+  } catch (error) {
+    console.error("提交项目评论失败：", error);
+    showToast("评论发布失败，请稍后重试。");
+  }
+});
+
+
+    
+async function renderGuestbook() {
+  const list = $("#guestList");
+  const count = $("#guestCount");
+
+  list.innerHTML = '<div class="empty-state">正在加载留言...</div>';
+
+  try {
+    const entries = await supabaseRequest(
+      "guestbook_entries?select=id,name,topic,body,created_at&order=created_at.desc&limit=100"
+    );
+
+    count.textContent = entries.length + " 条";
+
+    if (!entries.length) {
+      list.innerHTML = '<div class="empty-state">还没有留言，欢迎成为第一位访客。</div>';
+      return;
     }
-    $("#guestForm").addEventListener("submit", event => {
-      event.preventDefault();
-      const text = $("#guestMessage").value.trim(); if (!text) return;
-      const entries = safeGet("cuiPortfolio:guestbook", []);
-      entries.push({
-        name: $("#guestName").value.trim() || "访客",
-        topic: $("#guestTopic").value.trim(),
-        text,
-        date: new Date().toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })
-      });
+
+    list.innerHTML = entries.map(item => `
+      <div class="comment-item">
+        <div class="comment-meta">
+          <strong>${escapeHTML(item.name)}</strong>
+          <span>${new Date(item.created_at).toLocaleString("zh-CN")}</span>
+        </div>
+        ${item.topic ? `<div style="font-weight:650;font-size:13px;margin-bottom:5px">${escapeHTML(item.topic)}</div>` : ""}
+        <p>${escapeHTML(item.body)}</p>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    console.error("加载留言板失败：", error);
+    list.innerHTML = '<div class="empty-state">留言加载失败，请稍后刷新。</div>';
+    count.textContent = "暂时无法加载";
+  }
+}
+
+    
+$("#guestForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const text = $("#guestMessage").value.trim();
+  if (!text) {
+    showToast("请先输入留言内容。");
+    return;
+  }
+
+  const name = $("#guestName").value.trim() || "访客";
+  const topic = $("#guestTopic").value.trim();
+
+  if (name.length > 30 || topic.length > 60 || text.length > 800) {
+    showToast("昵称最多30个字符，主题最多60个字符，留言最多800个字符。");
+    return;
+  }
+
+  try {
+    await supabaseRequest("guestbook_entries", {
+      method: "POST",
+      body: JSON.stringify([{
+        name: name,
+        topic: topic,
+        body: text
+      }])
+    });
+
+    $("#guestMessage").value = "";
+    $("#guestName").value = "";
+    $("#guestTopic").value = "";
+
+    await renderGuestbook();
+    showToast("留言已发布，所有访客都可以看到。");
+  } catch (error) {
+    console.error("提交留言失败：", error);
+    showToast("留言发布失败，请稍后重试。");
+  }
+});
+
       if (safeSet("cuiPortfolio:guestbook", entries)) {
         $("#guestForm").reset(); renderGuestbook(); showToast("留言已保存在当前浏览器。");
       }
