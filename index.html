@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="description" content="崔的个人作品集：记录 2026—2027 年间的 C++、射频、嵌入式与游戏开发学习历程。">
+  <title>崔 — 个人作品集</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --surface: rgba(255,255,255,.82);
+      --card: #fff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: rgba(29,29,31,.09);
+      --blue: #3478f6;
+      --blue-soft: #eaf1ff;
+      --radius: 28px;
+      --shadow: 0 12px 36px rgba(20, 25, 35, .045);
+      --max: 1120px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.7; letter-spacing: -.015em;
+    }
+    button, input, textarea, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+    .container { width: min(var(--max), calc(100% - 40px)); margin-inline: auto; }
+    .nav-wrap {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(245,245,247,.76);
+      border-bottom: 1px solid rgba(29,29,31,.06);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    .nav { min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { font-weight: 720; font-size: 17px; letter-spacing: -.04em; white-space: nowrap; }
+    .brand-mark {
+      display: inline-grid; place-items: center; width: 30px; height: 30px; margin-right: 8px;
+      border-radius: 10px; background: var(--text); color: white; font-size: 14px; vertical-align: -3px;
+    }
+    .nav-links { display: flex; gap: 26px; align-items: center; color: var(--muted); font-size: 13px; }
+    .nav-links a { transition: color .2s ease; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .menu-toggle { display: none; border: 1px solid var(--line); background: white; border-radius: 12px; padding: 7px 11px; }
+    main { padding-bottom: 64px; }
+    section { padding-top: 82px; }
+    .eyebrow { color: var(--blue); font-size: 13px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(44px, 7vw, 76px); line-height: 1.06; letter-spacing: -.065em; margin-bottom: 22px; font-weight: 760; }
+    h2 { font-size: clamp(30px, 4vw, 46px); line-height: 1.13; letter-spacing: -.055em; margin-bottom: 14px; }
+    h3 { font-size: 21px; line-height: 1.3; letter-spacing: -.035em; margin-bottom: 10px; }
+    .lead { color: var(--muted); font-size: clamp(17px, 2.1vw, 21px); max-width: 680px; line-height: 1.65; }
+    .muted { color: var(--muted); }
+    .hero { padding-top: 90px; }
+    .hero-layout { display: grid; grid-template-columns: 1.15fr .85fr; align-items: center; gap: 48px; }
+    .hero-copy .lead { margin-bottom: 28px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 19px; border-radius: 999px; border: 1px solid transparent;
+      font-size: 14px; font-weight: 620; transition: transform .2s, background .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 6px 16px rgba(52,120,246,.18); }
+    .btn-primary:hover { background: #2368e8; }
+    .btn-secondary { background: rgba(255,255,255,.75); border-color: var(--line); }
+    .btn-secondary:hover { background: #fff; }
+    .hero-art {
+      min-height: 350px; position: relative; overflow: hidden; border-radius: 36px;
+      background: linear-gradient(145deg, #eaf1ff 0%, #f5f7fb 48%, #e8e9ed 100%);
+      display: grid; place-items: center; box-shadow: var(--shadow);
+    }
+    .orbit { position: absolute; width: 270px; height: 270px; border: 1px solid rgba(52,120,246,.18); border-radius: 50%; }
+    .orbit.two { width: 350px; height: 350px; }
+    .orbit.three { width: 430px; height: 430px; border-color: rgba(52,120,246,.10); }
+    .hero-glyph {
+      width: 150px; height: 150px; border-radius: 42px; background: #fff;
+      box-shadow: 0 25px 65px rgba(55,87,145,.16); display: grid; place-items: center;
+      color: var(--blue); font-size: 66px; font-weight: 750; letter-spacing: -.09em;
+      transform: rotate(-7deg); z-index: 1;
+    }
+    .floating-note {
+      position: absolute; bottom: 24px; right: 24px; background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.9); border-radius: 16px; padding: 12px 15px;
+      color: var(--muted); font-size: 12px; backdrop-filter: blur(12px);
+    }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+    .section-head p { margin-bottom: 0; max-width: 500px; }
+    .grid { display: grid; gap: 18px; }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      background: var(--card); border: 1px solid rgba(29,29,31,.045); border-radius: var(--radius);
+      padding: 27px; box-shadow: var(--shadow); min-width: 0;
+      transition: transform .24s ease, box-shadow .24s ease;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(20,25,35,.075); }
+    .featured-card { padding: 0; overflow: hidden; }
+    .project-cover {
+      min-height: 205px; display: grid; place-items: center; position: relative; overflow: hidden;
+      background: linear-gradient(140deg, #eaf1ff, #f7f8fb 58%, #e4e8f0);
+    }
+    .project-cover.dark { background: linear-gradient(145deg, #252934, #11131a); color: white; }
+    .project-cover.silver { background: linear-gradient(145deg, #e8e8ec, #f9f9fa); }
+    .project-cover.green { background: linear-gradient(145deg, #e5f0e9, #f7faf7); }
+    .cover-symbol {
+      width: 94px; height: 94px; display: grid; place-items: center; border-radius: 28px;
+      color: var(--blue); background: rgba(255,255,255,.86); font-size: 37px; font-weight: 750;
+      box-shadow: 0 18px 45px rgba(20,30,50,.10); letter-spacing: -.08em;
+    }
+    .cover-symbol.dark-symbol { color: #f3f5fa; background: #333846; }
+    .cover-decoration { position: absolute; width: 230px; height: 230px; border: 1px solid rgba(52,120,246,.16); border-radius: 50%; }
+    .cover-decoration::after { content: ""; position: absolute; inset: 22px; border: 1px solid rgba(52,120,246,.12); border-radius: 50%; }
+    .card-body { padding: 25px; }
+    .card-body p { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag { display: inline-flex; align-items: center; border-radius: 999px; background: #f2f2f5; color: #5d5d64; padding: 5px 10px; font-size: 11px; font-weight: 600; }
+    .tag.blue { background: var(--blue-soft); color: #275ec3; }
+    .text-link { color: var(--blue); font-weight: 620; font-size: 14px; display: inline-flex; gap: 7px; align-items: center; }
+    .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .about-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 22px; }
+    .profile-card { background: #1d1d1f; color: white; }
+    .profile-card .muted { color: #b8b8bd; }
+    .avatar { width: 68px; height: 68px; border-radius: 22px; background: #fff; color: #1d1d1f; display: grid; place-items: center; font-size: 30px; font-weight: 750; margin-bottom: 24px; }
+    .timeline { border-left: 1px solid #dedee3; margin: 24px 0 0 7px; padding-left: 23px; }
+    .timeline-item { position: relative; padding-bottom: 24px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-item::before { content: ""; position: absolute; left: -29px; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px #eaf1ff; }
+    .timeline-date { color: var(--blue); font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+    .timeline-item p { margin: 0; color: var(--muted); font-size: 14px; }
+    .skill-card { padding: 23px; }
+    .skill-icon { width: 43px; height: 43px; border-radius: 14px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); font-weight: 750; margin-bottom: 16px; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 9px; margin: 25px 0 28px; }
+    .filter-btn { border: 1px solid var(--line); background: rgba(255,255,255,.7); color: var(--muted); padding: 9px 15px; border-radius: 999px; font-size: 13px; transition: all .2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--text); color: white; border-color: var(--text); }
+    .project-card[hidden] { display: none; }
+    .detail-panel { display: none; margin-top: 22px; }
+    .detail-panel.open { display: block; }
+    .detail-top { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+    .detail-cover { border-radius: 24px; min-height: 240px; margin: 18px 0 24px; }
+    .detail-columns { display: grid; grid-template-columns: 1.3fr .7fr; gap: 28px; }
+    .comment-list, .guest-list { display: grid; gap: 12px; margin-top: 18px; }
+    .comment-item { padding: 15px 17px; border-radius: 17px; background: #f6f6f8; overflow-wrap: anywhere; }
+    .comment-meta { display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .comment-item p { margin: 0; font-size: 14px; white-space: pre-wrap; }
+    .form-grid { display: grid; gap: 12px; }
+    .field { width: 100%; border: 1px solid #e2e2e7; border-radius: 14px; background: #fff; padding: 12px 14px; outline: none; color: var(--text); transition: border .2s, box-shadow .2s; }
+    .field:focus { border-color: #8eb2ff; box-shadow: 0 0 0 4px rgba(52,120,246,.10); }
+    textarea.field { min-height: 105px; resize: vertical; }
+    .form-note { color: var(--muted); font-size: 12px; margin: 0; }
+    .empty-state { padding: 28px; text-align: center; color: var(--muted); border: 1px dashed #d9d9df; border-radius: 20px; }
+    .contact-card { background: linear-gradient(145deg, #fff, #f0f4fc); }
+    .contact-list { display: grid; gap: 13px; margin-top: 22px; }
+    .contact-row { display: flex; justify-content: space-between; gap: 15px; padding-bottom: 13px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .contact-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .contact-row span:first-child { color: var(--muted); }
+    .notice { border-radius: 18px; background: #eef3ff; color: #425777; padding: 15px 17px; font-size: 13px; }
+    footer { padding: 28px 0 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .to-top { color: var(--text); }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: #1d1d1f; color: white; padding: 11px 17px; border-radius: 999px; font-size: 13px; z-index: 100; transition: .25s; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 820px) {
+      .hero-layout, .about-layout, .detail-columns { grid-template-columns: 1fr; }
+      .hero-art { min-height: 280px; }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .nav-links { gap: 15px; }
+      section { padding-top: 66px; }
+    }
+    @media (max-width: 600px) {
+      .container { width: min(100% - 28px, var(--max)); }
+      .nav { min-height: 60px; flex-wrap: wrap; }
+      .menu-toggle { display: block; }
+      .nav-links { display: none; width: 100%; padding: 0 0 14px; flex-wrap: wrap; gap: 12px 18px; }
+      .nav-links.open { display: flex; }
+      .hero { padding-top: 56px; }
+      .hero-layout { gap: 32px; }
+      .hero-art { min-height: 250px; }
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-head .text-link { margin-top: 14px; }
+      .card { padding: 22px; border-radius: 23px; }
+      .featured-card { padding: 0; }
+      .card-body { padding: 22px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+      .contact-row { flex-direction: column; gap: 2px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-wrap">
+    <nav class="nav container" aria-label="主导航">
+      <a class="brand" href="#home" aria-label="崔的作品集首页"><span class="brand-mark">崔</span>个人作品集</a>
+      <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navLinks">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#home">首页</a>
+        <a href="#about">关于我</a>
+        <a href="#projects">作品</a>
+        <a href="#guestbook">留言</a>
+        <a href="#contact">联系</a>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+    <section class="hero container" id="home">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <div class="eyebrow">2026 — 2027 · Learning in public</div>
+          <h1>你好，我是崔。<br>持续学习，持续创造。</h1>
+          <p class="lead">一名利用课余时间探索技术的高中生。这里记录我在 C++、射频、嵌入式和游戏开发上的练习、想法与阶段性作品。</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#projects">探索我的作品 <span aria-hidden="true">↗</span></a>
+            <a class="btn btn-secondary" href="#about">认识一下我</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="原创字母图形装饰">
+          <div class="orbit three"></div><div class="orbit two"></div><div class="orbit"></div>
+          <div class="hero-glyph">C.</div>
+          <div class="floating-note">个人实验室 · 持续更新中</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" aria-labelledby="featuredTitle">
+      <div class="section-head">
+        <div><div class="eyebrow">精选作品</div><h2 id="featuredTitle">正在制作的故事。</h2></div>
+        <a class="text-link" href="#projects">查看全部作品 <span aria-hidden="true">→</span></a>
+      </div>
+      <article class="card featured-card">
+        <div class="project-cover">
+          <div class="cover-decoration"></div>
+          <div class="cover-symbol" aria-label="DengZan Game 原创标记">DZ</div>
+        </div>
+        <div class="card-body">
+          <div class="eyebrow">重点项目 · 游戏开发</div>
+          <h3>DengZan_Game</h3>
+          <p>邓赞的高中日常与故事。一个使用 Ren'Py 引擎制作的原创文字剧情小游戏，尝试用选择、对话与分支讲述校园日常。</p>
+          <div class="tag-row" style="margin-bottom:18px"><span class="tag blue">Ren'Py</span><span class="tag">原创剧情</span><span class="tag">持续开发</span></div>
+          <button class="text-link" type="button" data-open-project="dengzan">了解项目 <span aria-hidden="true">→</span></button>
+        </div>
+      </article>
+    </section>
+
+    <section class="container" id="about">
+      <div class="section-head">
+        <div><div class="eyebrow">关于我</div><h2>把好奇心变成作品。</h2></div>
+        <p class="muted">目前仍在学习阶段。这个网站既是作品展示页，也是记录过程、整理经验的小小空间。</p>
+      </div>
+      <div class="about-layout">
+        <article class="card profile-card">
+          <div class="avatar">崔</div>
+          <div class="eyebrow" style="color:#9bbcff">About the maker</div>
+          <h3 style="font-size:28px">高中生 · 技术爱好者</h3>
+          <p class="muted">我叫崔，利用课余时间自学 C++、射频与嵌入式相关知识。目前正在开发 Ren'Py 文字剧情游戏 DengZan_Game，也会把学习中的小实验整理成项目。</p>
+          <div class="tag-row"><span class="tag" style="background:#34353a;color:#eee">自主学习</span><span class="tag" style="background:#34353a;color:#eee">动手实践</span><span class="tag" style="background:#34353a;color:#eee">持续迭代</span></div>
+        </article>
+        <article class="card">
+          <div class="eyebrow">学习时间线</div>
+          <h3>2026 — 2027</h3>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-date">2026 · 基础学习</div><h3 style="font-size:17px">整理编程基础</h3><p>练习 C++ 语法、基础算法与代码组织，尝试把小练习做成可展示的项目。</p></div>
+            <div class="timeline-item"><div class="timeline-date">2026 · 项目探索</div><h3 style="font-size:17px">DengZan_Game 开发</h3><p>使用 Ren'Py 搭建对话、角色与剧情分支，逐步完善原创故事和视觉元素。</p></div>
+            <div class="timeline-item"><div class="timeline-date">2027 · 计划与实践</div><h3 style="font-size:17px">探索嵌入式与射频</h3><p>在安全、合规的学习环境中记录基础实验、资料整理与阶段性成果。实际进展会在完成后更新。</p></div>
+          </div>
+        </article>
+      </div>
+      <div class="grid grid-3" style="margin-top:18px">
+        <article class="card skill-card"><div class="skill-icon">C++</div><h3>C++ 编程</h3><p class="muted" style="font-size:14px;margin-bottom:0">语法基础、逻辑训练与小型代码项目。</p></article>
+        <article class="card skill-card"><div class="skill-icon">RF</div><h3>射频学习</h3><p class="muted" style="font-size:14px;margin-bottom:0">基础概念、信号知识与合规实验记录。</p></article>
+        <article class="card skill-card"><div class="skill-icon">MCU</div><h3>嵌入式探索</h3><p class="muted" style="font-size:14px;margin-bottom:0">了解硬件与软件协作，记录入门实践。</p></article>
+      </div>
+    </section>
+
+    <section class="container" id="projects">
+      <div class="section-head">
+        <div><div class="eyebrow">作品档案</div><h2>小项目，大量练习。</h2></div>
+        <p class="muted">这里展示已完成、进行中或计划中的学习项目。未完成的内容会明确标注，不将计划写成既成成果。</p>
+      </div>
+      <div class="filter-bar" role="group" aria-label="按项目类别筛选">
+        <button class="filter-btn active" data-filter="all">全部作品</button>
+        <button class="filter-btn" data-filter="game">游戏开发</button>
+        <button class="filter-btn" data-filter="cpp">C++ 代码项目</button>
+        <button class="filter-btn" data-filter="embedded">嵌入式</button>
+        <button class="filter-btn" data-filter="rf">射频项目</button>
+      </div>
+      <div class="grid grid-3" id="projectGrid">
+        <article class="card featured-card project-card" data-category="game" data-project="dengzan">
+          <div class="project-cover"><div class="cover-decoration"></div><div class="cover-symbol">DZ</div></div>
+          <div class="card-body"><div class="tag-row" style="margin-bottom:13px"><span class="tag blue">游戏开发</span><span class="tag">进行中</span></div><h3>DengZan_Game</h3><p>邓赞的高中日常与故事。使用 Ren'Py 引擎开发的原创文字剧情游戏，配套全新原创图标。</p><button class="text-link" data-open-project="dengzan">查看详情 →</button></div>
+        </article>
+        <article class="card featured-card project-card" data-category="cpp" data-project="cpp-lab">
+          <div class="project-cover silver"><div class="cover-symbol" style="color:#555">C++</div></div>
+          <div class="card-body"><div class="tag-row" style="margin-bottom:13px"><span class="tag blue">C++ 代码项目</span><span class="tag">学习练习</span></div><h3>C++ 学习实验册</h3><p>整理语法练习、简单算法与控制台小程序，记录从问题到实现的思路。</p><button class="text-link" data-open-project="cpp-lab">查看详情 →</button></div>
+        </article>
+        <article class="card featured-card project-card" data-category="embedded" data-project="embedded-notes">
+          <div class="project-cover green"><div class="cover-symbol" style="color:#43805b">IO</div></div>
+          <div class="card-body"><div class="tag-row" style="margin-bottom:13px"><span class="tag blue">嵌入式</span><span class="tag">学习记录</span></div><h3>嵌入式入门笔记</h3><p>计划记录基础电路、输入输出、微控制器与程序协作的学习过程。</p><button class="text-link" data-open-project="embedded-notes">查看详情 →</button></div>
+        </article>
+        <article class="card featured-card project-card" data-category="rf" data-project="rf-notes">
+          <div class="project-cover dark"><div class="cover-decoration"></div><div class="cover-symbol dark-symbol">RF</div></div>
+          <div class="card-body"><div class="tag-row" style="margin-bottom:13px"><span class="tag blue">射频项目</span><span class="tag">学习记录</span></div><h3>射频基础探索</h3><p>整理电磁波、频率、天线等基础概念，并记录合规、低风险的学习实验。</p><button class="text-link" data-open-project="rf-notes">查看详情 →</button></div>
+        </article>
+      </div>
+
+      <div class="card detail-panel" id="projectDetail" aria-live="polite">
+        <div class="detail-top"><div><div class="eyebrow" id="detailCategory">项目详情</div><h2 id="detailTitle" style="font-size:34px">项目名称</h2></div><button class="btn btn-secondary" id="closeDetail" type="button">收起 ×</button></div>
+        <div class="project-cover detail-cover" id="detailCover"><div class="cover-symbol" id="detailSymbol">DZ</div></div>
+        <div class="detail-columns">
+          <div><h3>项目介绍</h3><p class="muted" id="detailDescription"></p><h3 style="margin-top:26px">技术栈与方向</h3><div class="tag-row" id="detailTech"></div><p class="muted" style="font-size:12px;margin-top:18px">项目图片使用本页原创 CSS 图形占位；后续可替换为自己制作或拥有使用权的截图。</p></div>
+          <div><h3>作品评论</h3><p class="muted" style="font-size:13px">无需注册即可发表。评论仅保存在当前浏览器中。</p>
+            <form class="form-grid" id="projectCommentForm"><input class="field" id="commentName" maxlength="30" placeholder="昵称（选填，默认访客）"><textarea class="field" id="commentText" maxlength="500" placeholder="写下你的想法…" required></textarea><button class="btn btn-primary" type="submit">提交评论</button></form>
+            <div class="comment-list" id="projectCommentList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" id="guestbook">
+      <div class="section-head"><div><div class="eyebrow">访客留言</div><h2>欢迎留下建议。</h2></div><p class="muted">一个轻量留言板。可以分享建议、反馈问题，或聊聊你感兴趣的技术方向。</p></div>
+      <div class="grid grid-2">
+        <article class="card">
+          <h3>写一条留言</h3>
+          <form class="form-grid" id="guestForm">
+            <input class="field" id="guestName" maxlength="30" placeholder="昵称（选填，默认访客）">
+            <input class="field" id="guestTopic" maxlength="60" placeholder="主题（选填）">
+            <textarea class="field" id="guestMessage" maxlength="800" placeholder="留言内容…" required></textarea>
+            <button class="btn btn-primary" type="submit">发布留言</button>
+            <p class="form-note">无需登录。演示版留言只存储在当前设备和浏览器内。</p>
+          </form>
+        </article>
+        <article class="card">
+          <div class="detail-top"><h3>最近留言</h3><span class="tag" id="guestCount">0 条</span></div>
+          <div class="guest-list" id="guestList"><div class="empty-state">还没有留言，欢迎成为第一位访客。</div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="container" id="contact">
+      <div class="section-head"><div><div class="eyebrow">联系我</div><h2>保持交流，保持好奇。</h2></div></div>
+      <div class="grid grid-2">
+        <article class="card contact-card">
+          <h3>联系方式</h3>
+          <p class="muted">目前以学习和项目实践为主。你可以通过自己配置的公开联系方式联系我。</p>
+          <div class="contact-list">
+            <div class="contact-row"><span>姓名</span><strong>崔</strong></div>
+            <div class="contact-row"><span>方向</span><strong>C++ · 射频 · 嵌入式 · 游戏</strong></div>
+            <div class="contact-row"><span>邮箱</span><strong id="emailDisplay">请在代码中填写邮箱</strong></div>
+          </div>
+          <p class="form-note" style="margin-top:20px">为保护隐私，页面不会编造个人邮箱、电话或社交账号。发布前请自行填写愿意公开的信息。</p>
+        </article>
+        <article class="card">
+          <h3>关于这个网站</h3>
+          <p class="muted">这是一个独立制作的静态个人作品集。视觉语言借鉴了现代极简网页的通用设计原则，但页面布局、标记、图形和文案均为本项目原创，不使用苹果官方商标、图标或专有素材。</p>
+          <div class="notice">当前版本为纯前端演示。若希望不同访客都能看到同一份留言，需要接入后端 API 或托管数据库，并配置内容审核与防垃圾留言机制。</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container footer-inner"><span>© 2026–2027 崔的个人作品集 · 独立学习项目</span><a class="to-top" href="#home">回到顶部 ↑</a></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // 发布前可在这里填写愿意公开的邮箱；留空则显示隐私提示。
+    const PUBLIC_EMAIL = "";
+
+    const projects = {
+      "dengzan": {
+        title: "DengZan_Game", category: "游戏开发 · 进行中", symbol: "DZ", cover: "blue",
+        description: "邓赞的高中日常与故事。使用 Ren'Py 引擎制作的原创文字剧情小游戏，通过人物对话、剧情选择和分支探索校园日常。当前页面展示的是项目介绍与原创占位图形，实际开发进度可在后续更新。",
+        tech: ["Ren'Py", "Python 语法基础", "原创剧情", "原创图标"]
+      },
+      "cpp-lab": {
+        title: "C++ 学习实验册", category: "C++ 代码项目 · 学习练习", symbol: "C++", cover: "silver",
+        description: "用于归档 C++ 学习中的控制台程序、语法练习与简单算法。项目内容会随学习进度逐步补充；此条目目前是作品集结构示例，不代表所有练习都已完成。",
+        tech: ["C++", "基础算法", "调试与代码整理"]
+      },
+      "embedded-notes": {
+        title: "嵌入式入门笔记", category: "嵌入式 · 学习记录", symbol: "IO", cover: "green",
+        description: "计划整理微控制器、基础输入输出、软硬件协作等入门知识，并记录自己完成的练习和遇到的问题。",
+        tech: ["嵌入式基础", "数字输入输出", "实验记录"]
+      },
+      "rf-notes": {
+        title: "射频基础探索", category: "射频项目 · 学习记录", symbol: "RF", cover: "dark",
+        description: "用于整理频率、波长、天线和无线通信基础知识，并在合法合规、低风险的条件下开展基础学习与实验。",
+        tech: ["射频基础", "电磁波概念", "天线入门", "安全合规"]
+      }
+    };
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const safeGet = (key, fallback) => {
+      try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; }
+      catch { return fallback; }
+    };
+    const safeSet = (key, value) => {
+      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      catch { showToast("浏览器未能保存内容，请检查存储设置。"); return false; }
+    };
+    const escapeHTML = (value) => String(value).replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]));
+    function showToast(message) {
+      const toast = $("#toast"); toast.textContent = message; toast.classList.add("show");
+      clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+    $("#emailDisplay").textContent = PUBLIC_EMAIL.trim() || "请在代码中填写邮箱";
+    if (PUBLIC_EMAIL.trim()) $("#emailDisplay").innerHTML = `<a class="text-link" href="mailto:${encodeURIComponent(PUBLIC_EMAIL.trim())}">${escapeHTML(PUBLIC_EMAIL.trim())}</a>`;
+
+    $("#menuToggle").addEventListener("click", () => {
+      const open = $("#navLinks").classList.toggle("open");
+      $("#menuToggle").setAttribute("aria-expanded", String(open));
+    });
+    $$("#navLinks a").forEach(link => link.addEventListener("click", () => {
+      $("#navLinks").classList.remove("open"); $("#menuToggle").setAttribute("aria-expanded", "false");
+    }));
+
+    $$(".filter-btn").forEach(button => button.addEventListener("click", () => {
+      $$(".filter-btn").forEach(item => item.classList.toggle("active", item === button));
+      const filter = button.dataset.filter;
+      $$(".project-card").forEach(card => { card.hidden = filter !== "all" && card.dataset.category !== filter; });
+    }));
+
+    let currentProject = "dengzan";
+    function renderProjectComments() {
+      const comments = safeGet("cuiPortfolio:comments:" + currentProject, []);
+      const list = $("#projectCommentList");
+      if (!comments.length) { list.innerHTML = '<div class="empty-state">还没有评论，欢迎分享你的看法。</div>'; return; }
+      list.innerHTML = comments.slice().reverse().map(item => `
+        <div class="comment-item"><div class="comment-meta"><strong>${escapeHTML(item.name)}</strong><span>${escapeHTML(item.date)}</span></div><p>${escapeHTML(item.text)}</p></div>
+      `).join("");
+    }
+    function openProject(id) {
+      const project = projects[id]; if (!project) return;
+      currentProject = id;
+      $("#detailCategory").textContent = project.category;
+      $("#detailTitle").textContent = project.title;
+      $("#detailDescription").textContent = project.description;
+      $("#detailSymbol").textContent = project.symbol;
+      $("#detailCover").className = "project-cover detail-cover " + project.cover;
+      $("#detailTech").innerHTML = project.tech.map(tag => `<span class="tag blue">${escapeHTML(tag)}</span>`).join("");
+      renderProjectComments();
+      $("#projectDetail").classList.add("open");
+      $("#projectDetail").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    $$("[data-open-project]").forEach(button => button.addEventListener("click", () => openProject(button.dataset.openProject)));
+    $("#closeDetail").addEventListener("click", () => $("#projectDetail").classList.remove("open"));
+
+    $("#projectCommentForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const text = $("#commentText").value.trim(); if (!text) return;
+      const name = $("#commentName").value.trim() || "访客";
+      const comments = safeGet("cuiPortfolio:comments:" + currentProject, []);
+      comments.push({ name, text, date: new Date().toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" }) });
+      if (safeSet("cuiPortfolio:comments:" + currentProject, comments)) {
+        $("#commentText").value = ""; renderProjectComments(); showToast("评论已保存在当前浏览器。");
+      }
+    });
+
+    function renderGuestbook() {
+      const entries = safeGet("cuiPortfolio:guestbook", []);
+      $("#guestCount").textContent = entries.length + " 条";
+      const list = $("#guestList");
+      if (!entries.length) { list.innerHTML = '<div class="empty-state">还没有留言，欢迎成为第一位访客。</div>'; return; }
+      list.innerHTML = entries.slice().reverse().map(item => `
+        <div class="comment-item"><div class="comment-meta"><strong>${escapeHTML(item.name)}</strong><span>${escapeHTML(item.date)}</span></div>
+          ${item.topic ? `<div style="font-weight:650;font-size:13px;margin-bottom:5px">${escapeHTML(item.topic)}</div>` : ""}
+          <p>${escapeHTML(item.text)}</p></div>
+      `).join("");
+    }
+    $("#guestForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const text = $("#guestMessage").value.trim(); if (!text) return;
+      const entries = safeGet("cuiPortfolio:guestbook", []);
+      entries.push({
+        name: $("#guestName").value.trim() || "访客",
+        topic: $("#guestTopic").value.trim(),
+        text,
+        date: new Date().toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })
+      });
+      if (safeSet("cuiPortfolio:guestbook", entries)) {
+        $("#guestForm").reset(); renderGuestbook(); showToast("留言已保存在当前浏览器。");
+      }
+    });
+    renderGuestbook();
+  </script>
+</body>
+</html>
