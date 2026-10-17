@@ -356,14 +356,7 @@
           <div class="contact-list">
             <div class="contact-row"><span>姓名</span><strong>崔</strong></div>
             <div class="contact-row"><span>方向</span><strong>C++ · 射频 · 嵌入式 · 游戏</strong></div>
-            <div class="contact-row"><span>邮箱</span><strong id="emailDisplay">请在代码中填写邮箱</strong></div>
           </div>
-          <p class="form-note" style="margin-top:20px">为保护隐私，页面不会编造个人邮箱、电话或社交账号。发布前请自行填写愿意公开的信息。</p>
-        </article>
-        <article class="card">
-          <h3>关于这个网站</h3>
-          <p class="muted">这是一个独立制作的静态个人作品集。视觉语言借鉴了现代极简网页的通用设计原则，但页面布局、标记、图形和文案均为本项目原创，不使用苹果官方商标、图标或专有素材。</p>
-          <div class="notice">当前版本为纯前端演示。若希望不同访客都能看到同一份留言，需要接入后端 API 或托管数据库，并配置内容审核与防垃圾留言机制。</div>
         </article>
       </div>
     </section>
@@ -373,9 +366,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // 发布前可在这里填写愿意公开的邮箱；留空则显示隐私提示。
-    const PUBLIC_EMAIL = "";
-
     const projects = {
       "dengzan": {
         title: "DengZan_Game", category: "游戏开发 · 进行中", symbol: "DZ", cover: "blue",
@@ -416,9 +406,6 @@
       const toast = $("#toast"); toast.textContent = message; toast.classList.add("show");
       clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
     }
-    $("#emailDisplay").textContent = PUBLIC_EMAIL.trim() || "请在代码中填写邮箱";
-    if (PUBLIC_EMAIL.trim()) $("#emailDisplay").innerHTML = `<a class="text-link" href="mailto:${encodeURIComponent(PUBLIC_EMAIL.trim())}">${escapeHTML(PUBLIC_EMAIL.trim())}</a>`;
-
     $("#menuToggle").addEventListener("click", () => {
       const open = $("#navLinks").classList.toggle("open");
       $("#menuToggle").setAttribute("aria-expanded", String(open));
