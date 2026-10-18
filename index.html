@@ -339,7 +339,7 @@
             <input class="field" id="guestTopic" maxlength="60" placeholder="主题（选填）">
             <textarea class="field" id="guestMessage" maxlength="800" placeholder="留言内容…" required></textarea>
             <button class="btn btn-primary" type="submit">发布留言</button>
-            <p class="form-note">无需登录。演示版留言只存储在当前设备和浏览器内。</p>
+            <p class="form-note">无需登录。评论和留言会保存在云端，所有访客都可以查看。请勿填写个人隐私信息。</p>
           </form>
         </article>
         <article class="card">
@@ -368,26 +368,22 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-   
 const SUPABASE_URL = "https://ckpbotfdllcfeciyzzum.supabase.co";
 
-// 使用 Supabase 页面中 sb_publishable_ 开头的公钥
-const SUPABASE_KEY = "sb_publishable_ua7-YnVZY1_7sb0oyFsBIg_TiVMY9Jz";
+// 替换成你之前自己的完整 sb_publishable_ 公钥
+const SUPABASE_KEY = "sb_publishable_4isPzD2Iu52YNkks-mLTVA_YwQ1pkQ8";
 
 async function supabaseRequest(table, options = {}) {
-  const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/${table}`,
-    {
-      ...options,
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-        ...options.headers
-      }
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+      ...options.headers
     }
-  );
+  });
 
   if (!response.ok) {
     const detail = await response.text();
@@ -397,65 +393,94 @@ async function supabaseRequest(table, options = {}) {
   if (response.status === 204) return [];
   return response.json();
 }
- const projects = {
-      "dengzan": {
-        title: "DengZan_Game", category: "游戏开发 · 进行中", symbol: "DZ", cover: "blue",
-        description: "邓赞的高中日常与故事。使用 Ren'Py 引擎制作的原创文字剧情小游戏，通过人物对话、剧情选择和分支探索校园日常。当前页面展示的是项目介绍与原创占位图形，实际开发进度可在后续更新。",
-        tech: ["Ren'Py", "Python 语法基础", "原创剧情", "原创图标"]
-      },
-      "cpp-lab": {
-        title: "C++ 学习实验册", category: "C++ 代码项目 · 学习练习", symbol: "C++", cover: "silver",
-        description: "用于归档 C++ 学习中的控制台程序、语法练习与简单算法。项目内容会随学习进度逐步补充；此条目目前是作品集结构示例，不代表所有练习都已完成。",
-        tech: ["C++", "基础算法", "调试与代码整理"]
-      },
-      "embedded-notes": {
-        title: "嵌入式入门笔记", category: "嵌入式 · 学习记录", symbol: "IO", cover: "green",
-        description: "计划整理微控制器、基础输入输出、软硬件协作等入门知识，并记录自己完成的练习和遇到的问题。",
-        tech: ["嵌入式基础", "数字输入输出", "实验记录"]
-      },
-      "rf-notes": {
-        title: "射频基础探索", category: "射频项目 · 学习记录", symbol: "RF", cover: "dark",
-        description: "用于整理频率、波长、天线和无线通信基础知识，并在合法合规、低风险的条件下开展基础学习与实验。",
-        tech: ["射频基础", "电磁波概念", "天线入门", "安全合规"]
-      }
-    };
 
-    const $ = (selector, root = document) => root.querySelector(selector);
-    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-    const safeGet = (key, fallback) => {
-      try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; }
-      catch { return fallback; }
-    };
-    const safeSet = (key, value) => {
-      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
-      catch { showToast("浏览器未能保存内容，请检查存储设置。"); return false; }
-    };
-    const escapeHTML = (value) => String(value).replace(/[&<>"']/g, ch => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    }[ch]));
-    function showToast(message) {
-      const toast = $("#toast"); toast.textContent = message; toast.classList.add("show");
-      clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
-    }
-    $("#menuToggle").addEventListener("click", () => {
-      const open = $("#navLinks").classList.toggle("open");
-      $("#menuToggle").setAttribute("aria-expanded", String(open));
+const projects = {
+  "dengzan": {
+    title: "DengZan_Game",
+    category: "游戏开发 · 进行中",
+    symbol: "DZ",
+    cover: "blue",
+    description: "邓赞的高中日常与故事。使用 Ren'Py 引擎制作的原创文字剧情小游戏，通过人物对话、剧情选择和分支探索校园日常。当前页面展示的是项目介绍与原创占位图形，实际开发进度可在后续更新。",
+    tech: ["Ren'Py", "Python 语法基础", "原创剧情", "原创图标"]
+  },
+  "cpp-lab": {
+    title: "C++ 学习实验册",
+    category: "C++ 代码项目 · 学习练习",
+    symbol: "C++",
+    cover: "silver",
+    description: "用于归档 C++ 学习中的控制台程序、语法练习与简单算法。项目内容会随学习进度逐步补充；此条目目前是作品集结构示例，不代表所有练习都已完成。",
+    tech: ["C++", "基础算法", "调试与代码整理"]
+  },
+  "embedded-notes": {
+    title: "嵌入式入门笔记",
+    category: "嵌入式 · 学习记录",
+    symbol: "IO",
+    cover: "green",
+    description: "计划整理微控制器、基础输入输出、软硬件协作等入门知识，并记录自己完成的练习和遇到的问题。",
+    tech: ["嵌入式基础", "数字输入输出", "实验记录"]
+  },
+  "rf-notes": {
+    title: "射频基础探索",
+    category: "射频项目 · 学习记录",
+    symbol: "RF",
+    cover: "dark",
+    description: "用于整理频率、波长、天线和无线通信基础知识，并在合法合规、低风险的条件下开展基础学习与实验。",
+    tech: ["射频基础", "电磁波概念", "天线入门", "安全合规"]
+  }
+};
+
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+const escapeHTML = value => String(value).replace(/[&<>"']/g, ch => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+}[ch]));
+
+function showToast(message) {
+  const toast = $("#toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+$("#menuToggle").addEventListener("click", () => {
+  const open = $("#navLinks").classList.toggle("open");
+  $("#menuToggle").setAttribute("aria-expanded", String(open));
+});
+
+$$("#navLinks a").forEach(link => {
+  link.addEventListener("click", () => {
+    $("#navLinks").classList.remove("open");
+    $("#menuToggle").setAttribute("aria-expanded", "false");
+  });
+});
+
+$$(".filter-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    $$(".filter-btn").forEach(item => {
+      item.classList.toggle("active", item === button);
     });
-    $$("#navLinks a").forEach(link => link.addEventListener("click", () => {
-      $("#navLinks").classList.remove("open"); $("#menuToggle").setAttribute("aria-expanded", "false");
-    }));
 
-    $$(".filter-btn").forEach(button => button.addEventListener("click", () => {
-      $$(".filter-btn").forEach(item => item.classList.toggle("active", item === button));
-      const filter = button.dataset.filter;
-      $$(".project-card").forEach(card => { card.hidden = filter !== "all" && card.dataset.category !== filter; });
-    }));
+    const filter = button.dataset.filter;
 
-    let currentProject = "dengzan";
-   async 
+    $$(".project-card").forEach(card => {
+      card.hidden =
+        filter !== "all" && card.dataset.category !== filter;
+    });
+  });
+});
+
+let currentProject = "dengzan";
+
 async function renderProjectComments() {
-  const list = document.getElementById("projectCommentList");
-  list.innerHTML = '<div class="empty-state">正在加载评论...</div>';
+  const list = $("#projectCommentList");
+  list.innerHTML =
+    '<div class="empty-state">正在加载评论...</div>';
 
   try {
     const comments = await supabaseRequest(
@@ -463,7 +488,8 @@ async function renderProjectComments() {
     );
 
     if (!comments.length) {
-      list.innerHTML = '<div class="empty-state">还没有评论，欢迎分享你的看法。</div>';
+      list.innerHTML =
+        '<div class="empty-state">还没有评论，欢迎分享你的看法。</div>';
       return;
     }
 
@@ -476,30 +502,49 @@ async function renderProjectComments() {
         <p>${escapeHTML(item.body)}</p>
       </div>
     `).join("");
-
   } catch (error) {
     console.error("加载项目评论失败：", error);
-    list.innerHTML = '<div class="empty-state">评论加载失败，请稍后刷新。</div>';
+    list.innerHTML =
+      '<div class="empty-state">评论加载失败，请稍后刷新。</div>';
   }
 }
 
-    function openProject(id) {
-      const project = projects[id]; if (!project) return;
-      currentProject = id;
-      $("#detailCategory").textContent = project.category;
-      $("#detailTitle").textContent = project.title;
-      $("#detailDescription").textContent = project.description;
-      $("#detailSymbol").textContent = project.symbol;
-      $("#detailCover").className = "project-cover detail-cover " + project.cover;
-      $("#detailTech").innerHTML = project.tech.map(tag => `<span class="tag blue">${escapeHTML(tag)}</span>`).join("");
-      renderProjectComments();
-      $("#projectDetail").classList.add("open");
-      $("#projectDetail").scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    $$("[data-open-project]").forEach(button => button.addEventListener("click", () => openProject(button.dataset.openProject)));
-    $("#closeDetail").addEventListener("click", () => $("#projectDetail").classList.remove("open"));
+function openProject(id) {
+  const project = projects[id];
+  if (!project) return;
 
-    
+  currentProject = id;
+
+  $("#detailCategory").textContent = project.category;
+  $("#detailTitle").textContent = project.title;
+  $("#detailDescription").textContent = project.description;
+  $("#detailSymbol").textContent = project.symbol;
+  $("#detailCover").className =
+    "project-cover detail-cover " + project.cover;
+
+  $("#detailTech").innerHTML = project.tech.map(tag =>
+    `<span class="tag blue">${escapeHTML(tag)}</span>`
+  ).join("");
+
+  renderProjectComments();
+
+  $("#projectDetail").classList.add("open");
+  $("#projectDetail").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+$$("[data-open-project]").forEach(button => {
+  button.addEventListener("click", () => {
+    openProject(button.dataset.openProject);
+  });
+});
+
+$("#closeDetail").addEventListener("click", () => {
+  $("#projectDetail").classList.remove("open");
+});
+
 $("#projectCommentForm").addEventListener("submit", async event => {
   event.preventDefault();
 
@@ -535,13 +580,12 @@ $("#projectCommentForm").addEventListener("submit", async event => {
   }
 });
 
-
-    
 async function renderGuestbook() {
   const list = $("#guestList");
   const count = $("#guestCount");
 
-  list.innerHTML = '<div class="empty-state">正在加载留言...</div>';
+  list.innerHTML =
+    '<div class="empty-state">正在加载留言...</div>';
 
   try {
     const entries = await supabaseRequest(
@@ -551,7 +595,8 @@ async function renderGuestbook() {
     count.textContent = entries.length + " 条";
 
     if (!entries.length) {
-      list.innerHTML = '<div class="empty-state">还没有留言，欢迎成为第一位访客。</div>';
+      list.innerHTML =
+        '<div class="empty-state">还没有留言，欢迎成为第一位访客。</div>';
       return;
     }
 
@@ -561,19 +606,20 @@ async function renderGuestbook() {
           <strong>${escapeHTML(item.name)}</strong>
           <span>${new Date(item.created_at).toLocaleString("zh-CN")}</span>
         </div>
-        ${item.topic ? `<div style="font-weight:650;font-size:13px;margin-bottom:5px">${escapeHTML(item.topic)}</div>` : ""}
+        ${item.topic
+          ? `<div style="font-weight:650;font-size:13px;margin-bottom:5px">${escapeHTML(item.topic)}</div>`
+          : ""}
         <p>${escapeHTML(item.body)}</p>
       </div>
     `).join("");
-
   } catch (error) {
     console.error("加载留言板失败：", error);
-    list.innerHTML = '<div class="empty-state">留言加载失败，请稍后刷新。</div>';
+    list.innerHTML =
+      '<div class="empty-state">留言加载失败，请稍后刷新。</div>';
     count.textContent = "暂时无法加载";
   }
 }
 
-    
 $("#guestForm").addEventListener("submit", async event => {
   event.preventDefault();
 
@@ -613,11 +659,8 @@ $("#guestForm").addEventListener("submit", async event => {
   }
 });
 
-      if (safeSet("cuiPortfolio:guestbook", entries)) {
-        $("#guestForm").reset(); renderGuestbook(); showToast("留言已保存在当前浏览器。");
-      }
-    });
-    renderGuestbook();
+renderGuestbook();
+
   </script>
 </body>
 </html>
